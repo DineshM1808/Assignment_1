@@ -101,35 +101,18 @@ if st.button("Run Retail order Query"):
 # Section 2: Retail Orders Using JOIN Queries
 st.header("Retail Orders Using JOIN Queries")
 join_queries = {
-    "1. Inner Join - Order Details": """
-        SELECT o1.order_id, o1.order_date, o2.product_id, o2.quantity 
-        FROM orders1 o1 
-        INNER JOIN orders2 o2 ON o1.order_id = o2.order_id;
-    """,
-    "2. Left Join - All Orders": """
-        SELECT o1.order_id, o1.order_date, o1.segment, o2.sub_category, o2.quantity 
-        FROM orders1 o1 
-        LEFT JOIN orders2 o2 ON o1.order_id = o2.order_id;
-    """,
-    "3. Right Join - All Products": """
-        SELECT o1.order_id, o1.ship_mode, o1.state, o2.product_id, o2.quantity, o2.sale_price, o2.profit
-        FROM orders1 o1 
-        RIGHT JOIN orders2 o2 ON o1.order_id = o2.order_id;
-    """,
-    "4. Filtering Join - High Profit US Orders": """
+    "1. Find all orders from the United States that generated a profit greater than 500": """
         SELECT o1.order_date, o1.order_id, o1.region
         FROM orders1 o1 
         RIGHT JOIN orders2 o2 ON o1.order_id = o2.order_id
         WHERE o2.profit > 500 AND o1.country = 'United States';
     """,
-    "5. Aggregation - Total Sales & Profit Per Region": """
-        SELECT SUM(o2.sale_price) AS total_sales, SUM(o2.profit) AS total_profit, o1.region
-        FROM orders1 o1 
-        INNER JOIN orders2 o2 ON o1.order_id = o2.order_id 
-        GROUP BY o1.region 
-        ORDER BY total_sales DESC;
+    "2. Find all orders where the discount_percent is greater than 4%, showing order_id, product_id, sale_price, and profit": """
+        SELECT o2.order_id, o2.product_id, o2.sale_price, o2.profit 
+        FROM orders2 o2
+        WHERE o2.discount_percent > 4;
     """,
-    "6. Top 5 Cities by Revenue": """
+    "3. Find the top 5 cities with the highest total revenue": """
         SELECT o1.city, SUM(o2.sale_price) AS total_revenue
         FROM orders1 o1
         INNER JOIN orders2 o2 ON o1.order_id = o2.order_id
@@ -137,26 +120,43 @@ join_queries = {
         ORDER BY total_revenue DESC
         LIMIT 5;
     """,
-    "7. Average Discount Per Category": """
+    "4. Retrieve the order_id, order_date, product_id, and quantity for all orders": """
+        SELECT o1.order_id, o1.order_date, o2.product_id, o2.quantity 
+        FROM orders1 o1 
+        INNER JOIN orders2 o2 ON o1.order_id = o2.order_id;
+    """,
+    "5. Find the total sales and total profit for each region": """
+        SELECT SUM(o2.sale_price) AS total_sales, SUM(o2.profit) AS total_profit, o1.region
+        FROM orders1 o1 
+        INNER JOIN orders2 o2 ON o1.order_id = o2.order_id 
+        GROUP BY o1.region 
+        ORDER BY total_sales DESC;
+    """,
+    "6. Retrieve the order_id, order_date, segment, sub_category, and quantity for all orders": """
+        SELECT o1.order_id, o1.order_date, o1.segment, o2.sub_category, o2.quantity 
+        FROM orders1 o1 
+        LEFT JOIN orders2 o2 ON o1.order_id = o2.order_id;
+    """,
+    "7. Calculate the average discount_percent for each category": """
         SELECT AVG(o2.discount_percent) AS avg_discount, o1.category 
         FROM orders1 o1 
         INNER JOIN orders2 o2 ON o1.order_id = o2.order_id 
         GROUP BY o1.category 
         ORDER BY avg_discount DESC;
     """,
-    "8. Unique Products Sold Per Category": """
+    "8. Count the number of unique products (product_id) sold in each category": """
         SELECT o1.category, COUNT(DISTINCT o2.product_id) AS unique_products
         FROM orders1 o1 
         INNER JOIN orders2 o2 ON o1.order_id = o2.order_id
         GROUP BY o1.category
         ORDER BY unique_products;
     """,
-    "9. High Discount Orders": """
-        SELECT o2.order_id, o2.product_id, o2.sale_price, o2.profit 
-        FROM orders2 o2
-        WHERE o2.discount_percent > 4;
+    "9. Retrieve the order_id, ship_mode, state, product_id, quantity, sale_price, and profit for all products ": """
+        SELECT o1.order_id, o1.ship_mode, o1.state, o2.product_id, o2.quantity, o2.sale_price, o2.profit
+        FROM orders1 o1 
+        RIGHT JOIN orders2 o2 ON o1.order_id = o2.order_id;
     """,
-    "10. Consumer Segment Products": """
+    "10.List all products (product_id) sold in the 'Consumer' segment along with their respective sale_price and profit": """
         SELECT o2.product_id, o2.sale_price, o2.profit
         FROM orders1 o1
         JOIN orders2 o2 ON o1.order_id = o2.order_id
